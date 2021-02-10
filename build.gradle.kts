@@ -41,7 +41,14 @@ gradlePlugin {
 
 repositories {
     mavenCentral()
-    jcenter()
+    jcenter() {         //due to dokka - https://github.com/Kotlin/dokka/issues/41
+        mavenContent {
+            includeGroup("org.jetbrains.dokka")
+            includeGroup("org.jetbrains.kotlinx")
+            includeGroup("org.jetbrains")
+            includeGroup("com.soywiz.korlibs.korte")
+        }
+    }
 }
 
 val licenseHeaderFile = file("gradle/license-header.txt")
