@@ -22,13 +22,14 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.Duration
 
-open class BasicActionRetrier<R>(maxRetries: Int, delayBetween: Duration, stopFunction: (R) -> Boolean) : ActionRetrier<R> {
+open class BasicActionRetrier<R>(maxRetries: Int, delayBetween: Duration, handle: Class<out Throwable>, stopFunction: (R) -> Boolean) : ActionRetrier<R> {
 
     private val maxAttempts: Int = maxRetries + 1
 
     private val retrier: RetryPolicy<R> = RetryPolicy<R>()
         //TODO: Some exceptions could be handled separately
         .handleResultIf(stopFunction)
+        .handle(handle)
         .onFailedAttempt { event ->
             log.info("Attempt ${event.attemptCount}/$maxAttempts failed with result: ${event.lastResult}")
         }

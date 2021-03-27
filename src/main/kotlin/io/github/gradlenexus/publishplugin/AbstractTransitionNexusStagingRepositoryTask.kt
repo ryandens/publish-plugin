@@ -61,7 +61,7 @@ abstract class AbstractTransitionNexusStagingRepositoryTask(
             connectTimeout.orNull
         )
         val retrier = transitionCheckOptions.get().run {
-            BasicActionRetrier(maxRetries.get(), delayBetween.get(), StagingRepository::transitioning)
+            BasicActionRetrier(maxRetries.get(), delayBetween.get(), Throwable::class.java, StagingRepository::transitioning)
         }
         transitionStagingRepo(StagingRepositoryTransitioner(client, retrier))
     }
