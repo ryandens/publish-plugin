@@ -20,7 +20,7 @@ import io.github.gradlenexus.publishplugin.RepositoryTransitionException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class StagingRepositoryTransitioner(val nexusClient: NexusClient, val retrier: ActionRetrier<StagingRepository>) {
+class StagingRepositoryTransitioner(val nexusClient: NexusClient, val retrier: ActionRetrier<StagingRepository>, val transitionRetrier: ActionRetrier<Unit>) {
 
     companion object {
         private val log: Logger = LoggerFactory.getLogger(StagingRepositoryTransitioner::class.java.simpleName)
@@ -35,7 +35,7 @@ class StagingRepositoryTransitioner(val nexusClient: NexusClient, val retrier: A
     }
 
     private fun effectivelyChangeState(repoId: String, vararg desiredStates: StagingRepository.State, transitionClientRequest: (String) -> Unit) {
-        transitionClientRequest.invoke(repoId)
+        retryTransition(repoId, transitionClientRequest)
         val readStagingRepository = waitUntilTransitionIsDoneOrTimeoutAndReturnLastRepositoryState(repoId)
         assertRepositoryNotTransitioning(readStagingRepository)
         assertRepositoryInDesiredState(readStagingRepository, *desiredStates)
@@ -43,6 +43,11 @@ class StagingRepositoryTransitioner(val nexusClient: NexusClient, val retrier: A
 
     private fun waitUntilTransitionIsDoneOrTimeoutAndReturnLastRepositoryState(repoId: String) =
             retrier.execute { getStagingRepositoryStateById(repoId) }
+
+    private fun retryTransition(repoId: String, transitionClientRequest: (String) -> Unit) {
+        transitionRetrier.execute { transitionClientRequest.invoke(repoId)
+        }
+    }
 
     private fun getStagingRepositoryStateById(repoId: String): StagingRepository {
         val readStagingRepository: StagingRepository = nexusClient.getStagingRepositoryStateById(repoId)

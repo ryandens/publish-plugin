@@ -51,6 +51,13 @@ abstract class AbstractTransitionNexusStagingRepositoryTask(
 
     fun transitionCheckOptions(action: Action<in RetryOptions>) = action.execute(transitionCheckOptions.get())
 
+    @Internal
+    val transitionRetryOptions = project.objects.property<RetryOptions>().apply {
+        set(extension.transitionRetryOptions)
+    }
+
+    fun transitionRetryOptions(action: Action<in RetryOptions>) = action.execute(transitionRetryOptions.get())
+
     @TaskAction
     fun transitionStagingRepo() {
         val client = NexusClient(
@@ -63,7 +70,11 @@ abstract class AbstractTransitionNexusStagingRepositoryTask(
         val retrier = transitionCheckOptions.get().run {
             BasicActionRetrier(maxRetries.get(), delayBetween.get(), Throwable::class.java, StagingRepository::transitioning)
         }
-        transitionStagingRepo(StagingRepositoryTransitioner(client, retrier))
+
+        val transitionRetrier = transitionRetryOptions.get().run {
+            BasicActionRetrier<Unit>(maxRetries.get(), delayBetween.get(), RuntimeException::class.java) { true }
+        }
+        transitionStagingRepo(StagingRepositoryTransitioner(client, retrier, transitionRetrier))
     }
 
     protected abstract fun transitionStagingRepo(repositoryTransitioner: StagingRepositoryTransitioner)

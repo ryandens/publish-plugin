@@ -45,11 +45,17 @@ internal class StagingRepositoryTransitionerTest {
     @Mock
     private lateinit var retrier: ActionRetrier<StagingRepository>
 
+    private val transitionRetrier: ActionRetrier<Unit> = object : ActionRetrier<Unit> {
+        override fun execute(operationToExecuteWithRetrying: () -> Unit) {
+            operationToExecuteWithRetrying.invoke()
+        }
+    }
+
     private lateinit var transitioner: StagingRepositoryTransitioner
 
     @BeforeEach
     internal fun setUp() {
-        transitioner = StagingRepositoryTransitioner(nexusClient, retrier)
+        transitioner = StagingRepositoryTransitioner(nexusClient, retrier, transitionRetrier)
     }
 
     @Test
