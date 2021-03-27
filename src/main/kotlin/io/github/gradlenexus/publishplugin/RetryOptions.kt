@@ -21,7 +21,7 @@ import org.gradle.kotlin.dsl.property
 import java.time.Duration
 
 @Suppress("UnstableApiUsage")
-open class TransitionCheckOptions(objects: ObjectFactory) {
+open class RetryOptions(objects: ObjectFactory) {
 
     val maxRetries = objects.property<Int>().value(60)
 

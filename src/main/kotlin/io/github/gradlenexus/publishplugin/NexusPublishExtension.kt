@@ -46,9 +46,9 @@ open class NexusPublishExtension(project: Project) {
 
     val connectTimeout = project.objects.property<Duration>().value(Duration.ofMinutes(5))
 
-    val transitionCheckOptions = project.objects.property<TransitionCheckOptions>().value(TransitionCheckOptions(project.objects))
+    val transitionCheckOptions = project.objects.property<RetryOptions>().value(RetryOptions(project.objects))
 
-    fun transitionCheckOptions(action: Action<in TransitionCheckOptions>) = action.execute(transitionCheckOptions.get())
+    fun transitionCheckOptions(action: Action<in RetryOptions>) = action.execute(transitionCheckOptions.get())
 
     val repositories: NexusRepositoryContainer = DefaultNexusRepositoryContainer(project.container(NexusRepository::class) { name ->
         project.objects.newInstance(NexusRepository::class, name, project)

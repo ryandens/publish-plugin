@@ -45,11 +45,11 @@ abstract class AbstractTransitionNexusStagingRepositoryTask(
     }
 
     @Internal
-    val transitionCheckOptions = project.objects.property<TransitionCheckOptions>().apply {
+    val transitionCheckOptions = project.objects.property<RetryOptions>().apply {
         set(extension.transitionCheckOptions)
     }
 
-    fun transitionCheckOptions(action: Action<in TransitionCheckOptions>) = action.execute(transitionCheckOptions.get())
+    fun transitionCheckOptions(action: Action<in RetryOptions>) = action.execute(transitionCheckOptions.get())
 
     @TaskAction
     fun transitionStagingRepo() {
