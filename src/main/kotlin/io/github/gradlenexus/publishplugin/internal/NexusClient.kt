@@ -140,7 +140,11 @@ open class NexusClient(private val baseUrl: URI, username: String?, password: St
                 throw UncheckedIOException("Failed to read body of error response", e)
             }
         }
-        return RuntimeException(message)
+        return if (response.code() == 502) {
+            BadGatewayException(message)
+        } else {
+            RuntimeException(message)
+        }
     }
 
     private interface NexusApi {
