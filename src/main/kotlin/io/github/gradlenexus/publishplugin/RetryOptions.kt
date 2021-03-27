@@ -21,9 +21,9 @@ import org.gradle.kotlin.dsl.property
 import java.time.Duration
 
 @Suppress("UnstableApiUsage")
-open class RetryOptions(objects: ObjectFactory) {
+open class RetryOptions(objects: ObjectFactory, defaultRetries: Int, defaultDelayBetween: Long) {
 
-    val maxRetries = objects.property<Int>().value(60)
+    val maxRetries = objects.property<Int>().value(defaultRetries)
 
-    val delayBetween = objects.property<Duration>().value(Duration.ofSeconds(10))
+    val delayBetween = objects.property<Duration>().value(Duration.ofSeconds(defaultDelayBetween))
 }

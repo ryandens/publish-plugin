@@ -46,7 +46,11 @@ open class NexusPublishExtension(project: Project) {
 
     val connectTimeout = project.objects.property<Duration>().value(Duration.ofMinutes(5))
 
-    val transitionCheckOptions = project.objects.property<RetryOptions>().value(RetryOptions(project.objects))
+    val transitionRetryOptions = project.objects.property<RetryOptions>().value(RetryOptions(project.objects, 2, 5))
+
+    fun transitionRetryOptions(action: Action<in RetryOptions>) = action.execute(transitionRetryOptions.get())
+
+    val transitionCheckOptions = project.objects.property<RetryOptions>().value(RetryOptions(project.objects, 60, 10))
 
     fun transitionCheckOptions(action: Action<in RetryOptions>) = action.execute(transitionCheckOptions.get())
 
