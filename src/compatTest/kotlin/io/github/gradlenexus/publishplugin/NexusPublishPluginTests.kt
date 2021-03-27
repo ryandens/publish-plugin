@@ -806,6 +806,10 @@ class NexusPublishPluginTests {
                     maxRetries.set(3)
                     delayBetween.set(java.time.Duration.ofMillis(1))
                 }
+                transitionRetryOptions {
+                    maxRetries.set(3)
+                    delayBetween.set(java.time.Duration.ofMillis(1))
+                }
             }
         """)
     }
